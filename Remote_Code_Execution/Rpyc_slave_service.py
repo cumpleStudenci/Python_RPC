@@ -76,9 +76,22 @@ class MyService(rpyc.Service):
 			return False
 	pass
 	
-
+    """
+	Function checks if received code can be compiled.
+	
+	Returns:
+	True - if code can be compiled.
+	False - if it is not. And throw exception.
+	"""
 	def is_valid_python(self):
-		return
+	print('Code is: {}'.format(self.code))
+		try:
+			ast.parse(self.code)
+		except SyntaxError:
+			print('Code have errors')
+			return False
+		print('Code is valid')
+		return True
 	pass
 	
 	def exposed_execute_code(self):
