@@ -147,6 +147,9 @@ class MyService(rpyc.Service):
 	
 if __name__ == "__main__":
 	
+	"""
+	Path where saved codes will be stored.
+	"""
 	DIRECTORY = os.path.join(os.getcwd(), FILE_PATH)
 	if not os.path.exists(DIRECTORY): # if dir not exist, make new one
 		os.makedirs(FILE_PATH)

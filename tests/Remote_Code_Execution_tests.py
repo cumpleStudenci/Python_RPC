@@ -22,3 +22,16 @@ def test_bad_code():
 	conn = rpyc.connect(SERVER_IP_ADDRESS, PORT)
 	res = conn.root.send_and_check_code('print "hello world!"')
 	assert_equal(res, False)
+    
+def test_good_code():
+	conn = rpyc.connect(SERVER_IP_ADDRESS, PORT)
+	res = conn.root.send_and_check_code('print(\'hello world!\')')
+	assert_equal(res, True)
+	
+def test_code_return():
+	code = open("tests/python_code1.txt", 'r')
+	conn = rpyc.connect(SERVER_IP_ADDRESS, PORT)
+	conn.root.send_and_check_code(code.read())
+	res = conn.root.execute_code()
+	code.close()
+	assert_equal(res, 'Wielki sukces!')
