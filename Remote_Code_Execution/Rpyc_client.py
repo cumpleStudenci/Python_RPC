@@ -10,18 +10,7 @@ import time
 """
 Default port which is necessary for connection with a server.
 """
-PORT = 18861
-
-
-"""
-Getting first argument from command promt, and handling lack of it.
-"""
-try:
-	arg = sys.argv[1]
-except IndexError:
-	print('Proper usage of script: python Rpyc_client.py IP_Address')
-	sys.exit(1)
-	
+PORT = 18861	
 	
 """
 Opening connection beetwen server and client using Rpyc library on PORT.

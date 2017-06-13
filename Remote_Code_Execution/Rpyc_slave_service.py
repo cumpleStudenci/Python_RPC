@@ -76,7 +76,7 @@ class MyService(rpyc.Service):
 			return False
 	pass
 	
-    """
+	"""
 	Function checks if received code can be compiled.
 	
 	Returns:
@@ -84,7 +84,7 @@ class MyService(rpyc.Service):
 	False - if it is not. And throw exception.
 	"""
 	def is_valid_python(self):
-	print('Code is: {}'.format(self.code))
+		print('Code is: {}'.format(self.code))
 		try:
 			ast.parse(self.code)
 		except SyntaxError:
@@ -108,15 +108,52 @@ class MyService(rpyc.Service):
 		return result
 	pass
 	
+	"""
+	Function stores codes received from clients in format like:
+	conn[x], where x is a number of connection.
+	In addition, checks if file with specified name is already existting.
+	"""
 	def store_code(self):
-		return
+		file_name = self._conn._config["connid"] + '.txt'
+		file_localization = os.path.join(DIRECTORY, file_name)
+		if not os.path.exists(file_localization):
+			with open(file_localization, 'w') as text_file:
+				text_file.write(self.code)
+		print('Succesfully saved the code!')
+		self.code = None
 	pass
 	
+	"""
+	Function which is responsible for comparing code received from multiple clients.
+	Saves results to the temporary file, and sends results back to client, and after all file is being deleted.
+	Returns string (Full print like git diff) - result.
+	"""
 	def exposed_compare_codes(self):
-		return
+		result = ''
+		d = difflib.Differ()
+		if os.listdir(DIRECTORY):
+			for file in os.listdir(DIRECTORY):
+				with open(os.path.join(DIRECTORY, file), 'r') as content_file:
+					content = content_file.read()
+					if content == self.code:
+						result += 'Code same as in {}\n'.format(file)
+					else:
+						result += 'Differences with {}'.format(file)
+						diff = d.compare(self.code.splitlines(), content.splitlines())
+						result += '\n'.join(list(diff))
+		self.store_code()
+		return result
 	pass
 	
 if __name__ == "__main__":
+	
+	DIRECTORY = os.path.join(os.getcwd(), FILE_PATH)
+	if not os.path.exists(DIRECTORY): # if dir not exist, make new one
+		os.makedirs(FILE_PATH)
+	elif os.listdir(DIRECTORY): # if sth is in the dir
+		filelist = [ f for f in os.listdir(DIRECTORY) ]
+		for f in filelist:		# delete all in it
+			os.remove(os.path.join(DIRECTORY, f))
 	
 	thread = ThreadedServer(MyService, port = PORT)
 	thread.start()
