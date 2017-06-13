@@ -94,8 +94,18 @@ class MyService(rpyc.Service):
 		return True
 	pass
 	
+	"""
+	Function which is responsible for execution of code on the server side.
+	Saves results to the temporary file, and sends results back to client, and after all file is being deleted.
+	Returns string - result.
+	"""
 	def exposed_execute_code(self):
-		return
+		result = ''
+		exec(self.code)
+		with open(TMP_FILE, 'r') as tmp_file:
+			result = tmp_file.read()
+		os.remove(TMP_FILE)
+		return result
 	pass
 	
 	def store_code(self):
